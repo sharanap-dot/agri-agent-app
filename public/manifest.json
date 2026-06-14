@@ -1,10 +1,9 @@
 {
   "name": "AgriLedger ERP",
-  "short_name": "AgriERP",
-  "description": "Agricultural Trading ERP",
+  "short_name": "AgriLedger",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F8F7F4",
+  "background_color": "#ffffff",
   "theme_color": "#1F5E3B",
   "icons": [
     {
