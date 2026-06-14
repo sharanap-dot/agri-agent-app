@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "AgriLedger ERP",
-  description: "Agricultural Commission ERP Dashboard",
+  description: "Agricultural Trading ERP",
   manifest: "/manifest.json",
 
   icons: {
@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
     title: "AgriLedger ERP",
+    statusBarStyle: "default",
   },
 };
 
@@ -26,9 +26,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
       <body>{children}</body>
