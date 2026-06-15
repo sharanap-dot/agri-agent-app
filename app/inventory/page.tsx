@@ -77,24 +77,23 @@ export default function InventoryPage() {
     loadInventory();
   }
 
-  const filteredInventory = inventory.filter(
-    (item) =>
-      item.crop_name
-        ?.toLowerCase()
-        .includes(search.toLowerCase())
+  const filteredInventory = inventory.filter((item) =>
+    item.crop_name
+      ?.toLowerCase()
+      .includes(search.toLowerCase())
   );
 
   const totalStock = inventory.reduce(
-    (sum, item) =>
-      sum + Number(item.quantity || 0),
+    (sum, item) => sum + Number(item.quantity || 0),
     0
   );
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] p-8">
+    <div className="min-h-screen bg-[#F8F7F4] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
 
-        <h1 className="text-5xl font-bold text-[#1F5E3B] mb-2">
+        {/* Header */}
+        <h1 className="text-3xl md:text-5xl font-bold text-[#1F5E3B] mb-2">
           📦 Inventory Management
         </h1>
 
@@ -103,7 +102,7 @@ export default function InventoryPage() {
         </p>
 
         {/* Summary */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
           <div className="bg-white rounded-3xl shadow-lg p-6">
             <h3 className="text-gray-600">
@@ -130,7 +129,7 @@ export default function InventoryPage() {
         {/* Add Stock */}
         <div className="bg-white rounded-3xl shadow-lg p-6 mb-8">
 
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
             <input
               type="text"
@@ -139,7 +138,7 @@ export default function InventoryPage() {
               onChange={(e) =>
                 setCropName(e.target.value)
               }
-              className="border rounded-xl p-3"
+              className="border rounded-xl p-3 w-full"
             />
 
             <input
@@ -149,7 +148,7 @@ export default function InventoryPage() {
               onChange={(e) =>
                 setQuantity(e.target.value)
               }
-              className="border rounded-xl p-3"
+              className="border rounded-xl p-3 w-full"
             />
 
             <select
@@ -157,26 +156,18 @@ export default function InventoryPage() {
               onChange={(e) =>
                 setUnit(e.target.value)
               }
-              className="border rounded-xl p-3"
+              className="border rounded-xl p-3 w-full"
             >
-              <option>
-                Quintal
-              </option>
-
-              <option>
-                KG
-              </option>
-
-              <option>
-                Bags
-              </option>
+              <option>Quintal</option>
+              <option>KG</option>
+              <option>Bags</option>
             </select>
 
           </div>
 
           <button
             onClick={saveInventory}
-            className="mt-6 bg-[#1F5E3B] text-white px-6 py-3 rounded-2xl"
+            className="mt-6 bg-[#1F5E3B] hover:bg-green-800 text-white px-6 py-3 rounded-2xl"
           >
             Add Stock
           </button>
@@ -198,94 +189,150 @@ export default function InventoryPage() {
 
         </div>
 
-        {/* Table */}
-        <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
+        {/* Inventory List */}
+        <div className="bg-white rounded-3xl shadow-lg p-4">
 
-          <table className="w-full">
+          {/* MOBILE VIEW */}
+          <div className="md:hidden space-y-4">
 
-            <thead className="bg-[#1F5E3B] text-white">
-              <tr>
-                <th className="p-4 text-left">
-                  Crop
-                </th>
-
-                <th className="p-4 text-left">
-                  Quantity
-                </th>
-
-                <th className="p-4 text-left">
-                  Unit
-                </th>
-
-                <th className="p-4 text-left">
-                  Status
-                </th>
-
-                <th className="p-4 text-left">
-                  Action
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-
-              {filteredInventory.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-b hover:bg-gray-50"
-                >
-                  <td className="p-4 font-medium">
+            {filteredInventory.map((item) => (
+              <div
+                key={item.id}
+                className="border rounded-2xl p-4 shadow-sm"
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-bold text-lg text-[#1F5E3B]">
                     {item.crop_name}
-                  </td>
+                  </h3>
 
-                  <td className="p-4">
-                    {item.quantity}
-                  </td>
+                  {Number(item.quantity) < 10 ? (
+                    <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">
+                      Low Stock
+                    </span>
+                  ) : (
+                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                      In Stock
+                    </span>
+                  )}
+                </div>
 
-                  <td className="p-4">
-                    {item.unit}
-                  </td>
+                <p className="text-gray-600">
+                  Quantity: <b>{item.quantity}</b>
+                </p>
 
-                  <td className="p-4">
-                    {Number(item.quantity) < 10 ? (
-                      <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full">
-                        Low Stock
-                      </span>
-                    ) : (
-                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                        In Stock
-                      </span>
-                    )}
-                  </td>
+                <p className="text-gray-600 mt-1">
+                  Unit: <b>{item.unit}</b>
+                </p>
 
-                  <td className="p-4">
-                    <button
-                      onClick={() =>
-                        deleteInventory(item.id)
-                      }
-                      className="bg-red-600 text-white px-4 py-2 rounded-lg"
-                    >
-                      Delete
-                    </button>
-                  </td>
+                <button
+                  onClick={() =>
+                    deleteInventory(item.id)
+                  }
+                  className="mt-4 bg-red-600 text-white px-4 py-2 rounded-xl w-full"
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
 
-                </tr>
-              ))}
+            {filteredInventory.length === 0 && (
+              <div className="text-center text-gray-500 py-8">
+                No inventory found
+              </div>
+            )}
 
-              {filteredInventory.length === 0 && (
+          </div>
+
+          {/* DESKTOP VIEW */}
+          <div className="hidden md:block overflow-x-auto">
+
+            <table className="w-full min-w-[700px]">
+
+              <thead className="bg-[#1F5E3B] text-white">
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="text-center p-8 text-gray-500"
-                  >
-                    No inventory found
-                  </td>
+                  <th className="p-4 text-left">
+                    Crop
+                  </th>
+
+                  <th className="p-4 text-left">
+                    Quantity
+                  </th>
+
+                  <th className="p-4 text-left">
+                    Unit
+                  </th>
+
+                  <th className="p-4 text-left">
+                    Status
+                  </th>
+
+                  <th className="p-4 text-left">
+                    Action
+                  </th>
                 </tr>
-              )}
+              </thead>
 
-            </tbody>
+              <tbody>
 
-          </table>
+                {filteredInventory.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="border-b hover:bg-gray-50"
+                  >
+                    <td className="p-4 font-medium">
+                      {item.crop_name}
+                    </td>
+
+                    <td className="p-4">
+                      {item.quantity}
+                    </td>
+
+                    <td className="p-4">
+                      {item.unit}
+                    </td>
+
+                    <td className="p-4">
+                      {Number(item.quantity) < 10 ? (
+                        <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full">
+                          Low Stock
+                        </span>
+                      ) : (
+                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full">
+                          In Stock
+                        </span>
+                      )}
+                    </td>
+
+                    <td className="p-4">
+                      <button
+                        onClick={() =>
+                          deleteInventory(item.id)
+                        }
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg"
+                      >
+                        Delete
+                      </button>
+                    </td>
+
+                  </tr>
+                ))}
+
+                {filteredInventory.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="text-center p-8 text-gray-500"
+                    >
+                      No inventory found
+                    </td>
+                  </tr>
+                )}
+
+              </tbody>
+
+            </table>
+
+          </div>
 
         </div>
 
