@@ -6,11 +6,10 @@ import { supabase } from "@/lib/supabase";
 
 export default function FarmersPage() {
   const [farmers, setFarmers] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
-
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [village, setVillage] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     loadFarmers();
@@ -51,7 +50,7 @@ export default function FarmersPage() {
       return;
     }
 
-    alert("Farmer saved successfully");
+    alert("Farmer added successfully");
 
     setName("");
     setPhone("");
@@ -61,11 +60,7 @@ export default function FarmersPage() {
   }
 
   async function deleteFarmer(id: string) {
-    const confirmDelete = confirm(
-      "Delete this farmer?"
-    );
-
-    if (!confirmDelete) return;
+    if (!confirm("Delete farmer?")) return;
 
     const { error } = await supabase
       .from("farmers")
@@ -80,114 +75,130 @@ export default function FarmersPage() {
     loadFarmers();
   }
 
-  const filteredFarmers = farmers.filter(
-    (f) =>
-      f.name
-        ?.toLowerCase()
-        .includes(search.toLowerCase()) ||
-      f.phone
-        ?.toLowerCase()
-        .includes(search.toLowerCase()) ||
-      f.village
-        ?.toLowerCase()
-        .includes(search.toLowerCase())
+  const filteredFarmers = farmers.filter((farmer) =>
+    farmer.name?.toLowerCase().includes(search.toLowerCase()) ||
+    farmer.village?.toLowerCase().includes(search.toLowerCase()) ||
+    farmer.phone?.includes(search)
   );
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] p-8">
+    <div className="min-h-screen bg-[#F8F7F4] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-5xl font-bold text-[#1F5E3B]">
-            🌾 Farmers Registry
-          </h1>
+        <h1 className="text-3xl md:text-5xl font-bold text-[#1F5E3B] mb-2">
+          👨‍🌾 Farmers Registry
+        </h1>
 
-          <p className="text-gray-600 mt-2">
-            Manage farmers and their details
-          </p>
-        </div>
+        <p className="text-gray-600 mb-8">
+          Manage farmers and their ledgers
+        </p>
 
         {/* Add Farmer */}
         <div className="bg-white rounded-3xl shadow-lg p-6 mb-8">
 
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
             <input
               type="text"
               placeholder="Farmer Name"
-              className="border rounded-xl p-3"
               value={name}
-              onChange={(e) =>
-                setName(e.target.value)
-              }
+              onChange={(e) => setName(e.target.value)}
+              className="border rounded-xl p-3"
             />
 
             <input
               type="text"
               placeholder="Phone Number"
-              className="border rounded-xl p-3"
               value={phone}
-              onChange={(e) =>
-                setPhone(e.target.value)
-              }
+              onChange={(e) => setPhone(e.target.value)}
+              className="border rounded-xl p-3"
             />
 
             <input
               type="text"
               placeholder="Village"
-              className="border rounded-xl p-3"
               value={village}
-              onChange={(e) =>
-                setVillage(e.target.value)
-              }
+              onChange={(e) => setVillage(e.target.value)}
+              className="border rounded-xl p-3"
             />
 
           </div>
 
           <button
             onClick={saveFarmer}
-            className="mt-6 bg-[#1F5E3B] text-white px-6 py-3 rounded-2xl hover:bg-green-800"
+            className="mt-6 bg-[#1F5E3B] text-white px-6 py-3 rounded-2xl"
           >
-            Save Farmer
+            Add Farmer
           </button>
+
         </div>
 
         {/* Search */}
         <div className="bg-white rounded-3xl shadow-lg p-5 mb-8">
+
           <input
             type="text"
             placeholder="🔍 Search farmer..."
-            className="w-full border rounded-xl p-3"
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full border rounded-xl p-3"
           />
+
         </div>
 
-        {/* Farmers Table */}
-        <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
+        {/* Mobile Cards */}
+        <div className="md:hidden space-y-4">
 
-          <table className="w-full">
+          {filteredFarmers.map((farmer) => (
+            <div
+              key={farmer.id}
+              className="bg-white rounded-3xl shadow-lg p-5"
+            >
+              <h2 className="text-xl font-bold text-[#1F5E3B]">
+                {farmer.name}
+              </h2>
+
+              <p className="text-gray-600 mt-2">
+                📞 {farmer.phone}
+              </p>
+
+              <p className="text-gray-600">
+                📍 {farmer.village}
+              </p>
+
+              <div className="flex gap-2 mt-4">
+
+                <Link
+                  href={`/farmers/${farmer.id}/ledger`}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Ledger
+                </Link>
+
+                <button
+                  onClick={() => deleteFarmer(farmer.id)}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Delete
+                </button>
+
+              </div>
+            </div>
+          ))}
+
+        </div>
+
+        {/* Desktop Table */}
+        <div className="hidden md:block bg-white rounded-3xl shadow-lg overflow-x-auto">
+
+          <table className="w-full min-w-[900px]">
 
             <thead className="bg-[#1F5E3B] text-white">
               <tr>
-                <th className="p-4 text-left">
-                  Name
-                </th>
-
-                <th className="p-4 text-left">
-                  Phone
-                </th>
-
-                <th className="p-4 text-left">
-                  Village
-                </th>
-
-                <th className="p-4 text-left">
-                  Actions
-                </th>
+                <th className="p-4 text-left">Name</th>
+                <th className="p-4 text-left">Phone</th>
+                <th className="p-4 text-left">Village</th>
+                <th className="p-4 text-left">Actions</th>
               </tr>
             </thead>
 
@@ -198,37 +209,30 @@ export default function FarmersPage() {
                   key={farmer.id}
                   className="border-b hover:bg-gray-50"
                 >
-                  <td className="p-4 font-medium">
-                    {farmer.name}
-                  </td>
+                  <td className="p-4">{farmer.name}</td>
 
-                  <td className="p-4">
-                    {farmer.phone}
-                  </td>
+                  <td className="p-4">{farmer.phone}</td>
 
-                  <td className="p-4">
-                    {farmer.village}
-                  </td>
+                  <td className="p-4">{farmer.village}</td>
 
                   <td className="p-4 flex gap-2">
 
                     <Link
-                      href={`/farmers/${farmer.id}`}
+                      href={`/farmers/${farmer.id}/ledger`}
                       className="bg-blue-600 text-white px-4 py-2 rounded-lg"
                     >
-                      View
+                      Ledger
                     </Link>
 
                     <button
-                      onClick={() =>
-                        deleteFarmer(farmer.id)
-                      }
+                      onClick={() => deleteFarmer(farmer.id)}
                       className="bg-red-600 text-white px-4 py-2 rounded-lg"
                     >
                       Delete
                     </button>
 
                   </td>
+
                 </tr>
               ))}
 
@@ -244,6 +248,7 @@ export default function FarmersPage() {
               )}
 
             </tbody>
+
           </table>
 
         </div>

@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-export default function SetupPage() {
-  const router = useRouter();
-
+export default function CompanyPage() {
+  const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   const [companyName, setCompanyName] = useState("");
@@ -16,40 +14,46 @@ export default function SetupPage() {
   const [gstNumber, setGstNumber] = useState("");
 
   useEffect(() => {
-    checkCompany();
+    loadCompany();
   }, []);
 
-  async function checkCompany() {
-    const { data } = await supabase
+  async function loadCompany() {
+    const { data, error } = await supabase
       .from("company")
       .select("*")
       .limit(1)
       .single();
 
+    if (error) {
+      console.log(error.message);
+      return;
+    }
+
     if (data) {
-      router.push("/");
+      setCompany(data);
+      setCompanyName(data.company_name || "");
+      setOwnerName(data.owner_name || "");
+      setPhone(data.phone || "");
+      setAddress(data.address || "");
+      setGstNumber(data.gst_number || "");
     }
   }
 
-  async function saveCompany() {
-    if (!companyName || !ownerName) {
-      alert("Please fill Company Name and Owner Name");
-      return;
-    }
+  async function updateCompany() {
+    if (!company) return;
 
     setLoading(true);
 
     const { error } = await supabase
       .from("company")
-      .insert([
-        {
-          company_name: companyName,
-          owner_name: ownerName,
-          phone,
-          address,
-          gst_number: gstNumber,
-        },
-      ]);
+      .update({
+        company_name: companyName,
+        owner_name: ownerName,
+        phone,
+        address,
+        gst_number: gstNumber,
+      })
+      .eq("id", company.id);
 
     setLoading(false);
 
@@ -58,23 +62,20 @@ export default function SetupPage() {
       return;
     }
 
-    localStorage.setItem("company_setup", "true");
-
-    alert("Company setup completed successfully!");
-
-    router.push("/");
+    alert("Company updated successfully");
+    loadCompany();
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl p-8">
+    <div className="min-h-screen bg-[#F8F7F4] p-4 md:p-8">
+      <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-lg p-8">
 
-        <h1 className="text-3xl md:text-4xl font-bold text-center text-[#1F5E3B] mb-2">
-          🏢 Company Setup
+        <h1 className="text-3xl md:text-4xl font-bold text-[#1F5E3B] mb-2">
+          🏢 Company Settings
         </h1>
 
-        <p className="text-center text-gray-600 mb-8">
-          Configure your trading company
+        <p className="text-gray-600 mb-8">
+          Update company details
         </p>
 
         <div className="space-y-4">
@@ -83,7 +84,9 @@ export default function SetupPage() {
             type="text"
             placeholder="Company Name"
             value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
+            onChange={(e) =>
+              setCompanyName(e.target.value)
+            }
             className="w-full border rounded-xl p-3"
           />
 
@@ -91,7 +94,9 @@ export default function SetupPage() {
             type="text"
             placeholder="Owner Name"
             value={ownerName}
-            onChange={(e) => setOwnerName(e.target.value)}
+            onChange={(e) =>
+              setOwnerName(e.target.value)
+            }
             className="w-full border rounded-xl p-3"
           />
 
@@ -99,14 +104,18 @@ export default function SetupPage() {
             type="text"
             placeholder="Phone Number"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) =>
+              setPhone(e.target.value)
+            }
             className="w-full border rounded-xl p-3"
           />
 
           <textarea
-            placeholder="Company Address"
+            placeholder="Address"
             value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            onChange={(e) =>
+              setAddress(e.target.value)
+            }
             rows={3}
             className="w-full border rounded-xl p-3"
           />
@@ -115,16 +124,18 @@ export default function SetupPage() {
             type="text"
             placeholder="GST Number"
             value={gstNumber}
-            onChange={(e) => setGstNumber(e.target.value)}
+            onChange={(e) =>
+              setGstNumber(e.target.value)
+            }
             className="w-full border rounded-xl p-3"
           />
 
           <button
-            onClick={saveCompany}
+            onClick={updateCompany}
             disabled={loading}
             className="w-full bg-[#1F5E3B] hover:bg-green-800 text-white py-3 rounded-2xl font-semibold"
           >
-            {loading ? "Saving..." : "Save & Continue"}
+            {loading ? "Updating..." : "Update Company"}
           </button>
 
         </div>

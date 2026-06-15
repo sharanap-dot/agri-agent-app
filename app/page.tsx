@@ -1,6 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 import {
   Users,
   ShoppingCart,
@@ -9,31 +12,54 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
+  const router = useRouter();
+
+  const [company, setCompany] = useState<any>(null);
+
+  useEffect(() => {
+    checkCompany();
+  }, []);
+
+  async function checkCompany() {
+    const { data, error } = await supabase
+      .from("company")
+      .select("*")
+      .limit(1)
+      .single();
+
+    if (error || !data) {
+      router.push("/setup");
+      return;
+    }
+
+    setCompany(data);
+  }
+
   const stats = [
     {
       title: "Farmers",
-      value: 2,
+      value: 0,
       href: "/farmers",
       color: "bg-green-100 text-green-700",
       icon: <Users size={28} />,
     },
     {
       title: "Buyers",
-      value: 1,
+      value: 0,
       href: "/buyers",
       color: "bg-blue-100 text-blue-700",
       icon: <ShoppingCart size={28} />,
     },
     {
       title: "Transactions",
-      value: 2,
+      value: 0,
       href: "/transactions",
       color: "bg-purple-100 text-purple-700",
       icon: <ArrowLeftRight size={28} />,
     },
     {
       title: "Inventory",
-      value: 2,
+      value: 0,
       href: "/inventory",
       color: "bg-yellow-100 text-yellow-700",
       icon: <Package size={28} />,
@@ -41,19 +67,36 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="p-4 md:p-8">
+    <div className="p-4 md:p-8 min-h-screen bg-[#F8F7F4]">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl md:text-6xl font-bold text-[#1F5E3B]">
-          SHREE MAHANTESHWARA TRADERS
+          {company?.company_name || "Company Name"}
         </h1>
 
         <p className="mt-2 text-lg md:text-2xl text-gray-600">
           Agricultural Commission ERP Dashboard
         </p>
+
+        <div className="mt-3 text-gray-700 space-y-1">
+          <p>
+            <strong>Owner:</strong>{" "}
+            {company?.owner_name || "-"}
+          </p>
+
+          <p>
+            <strong>Phone:</strong>{" "}
+            {company?.phone || "-"}
+          </p>
+
+          <p>
+            <strong>Address:</strong>{" "}
+            {company?.address || "-"}
+          </p>
+        </div>
       </div>
 
-      {/* Stats */}
+      {/* Dashboard Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {stats.map((item, index) => (
           <Link
@@ -82,7 +125,7 @@ export default function DashboardPage() {
           </h2>
 
           <p className="text-2xl md:text-4xl font-bold mt-4 break-all">
-            ₹ 16,03,718.45
+            ₹ 0.00
           </p>
         </div>
       </div>
