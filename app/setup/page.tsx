@@ -1,39 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function SetupPage() {
   const router = useRouter();
 
-  const [loading, setLoading] = useState(false);
-
   const [companyName, setCompanyName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [gstNumber, setGstNumber] = useState("");
-
-  useEffect(() => {
-    checkCompany();
-  }, []);
-
-  async function checkCompany() {
-    const { data } = await supabase
-      .from("company")
-      .select("*")
-      .limit(1)
-      .single();
-
-    if (data) {
-      router.push("/");
-    }
-  }
+  const [loading, setLoading] = useState(false);
 
   async function saveCompany() {
-    if (!companyName || !ownerName) {
-      alert("Please fill Company Name and Owner Name");
+    if (
+      !companyName ||
+      !ownerName ||
+      !phone ||
+      !address ||
+      !gstNumber
+    ) {
+      alert("Please fill all fields");
       return;
     }
 
@@ -43,10 +32,10 @@ export default function SetupPage() {
       .from("company")
       .insert([
         {
-          company_name: companyName,
+          name: companyName,
           owner_name: ownerName,
-          phone,
-          address,
+          phone: phone,
+          address: address,
           gst_number: gstNumber,
         },
       ]);
@@ -58,76 +47,69 @@ export default function SetupPage() {
       return;
     }
 
-    localStorage.setItem("company_setup", "true");
+    alert("Company saved successfully");
 
-    alert("Company setup completed successfully!");
-
-    router.push("/");
+    router.push("/dashboard");
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl p-8">
+    <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center p-6">
+      <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-2xl">
 
-        <h1 className="text-3xl md:text-4xl font-bold text-center text-[#1F5E3B] mb-2">
-          🏢 Company Setup
+        <h1 className="text-4xl font-bold text-[#1F5E3B] mb-2">
+          Company Setup
         </h1>
 
-        <p className="text-center text-gray-600 mb-8">
-          Configure your trading company
+        <p className="text-gray-500 mb-8">
+          Enter company details before using AgriLedger ERP
         </p>
 
-        <div className="space-y-4">
+        <input
+          type="text"
+          placeholder="Company Name"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          className="w-full border rounded-xl p-4 mb-4"
+        />
 
-          <input
-            type="text"
-            placeholder="Company Name"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-            className="w-full border rounded-xl p-3"
-          />
+        <input
+          type="text"
+          placeholder="Owner Name"
+          value={ownerName}
+          onChange={(e) => setOwnerName(e.target.value)}
+          className="w-full border rounded-xl p-4 mb-4"
+        />
 
-          <input
-            type="text"
-            placeholder="Owner Name"
-            value={ownerName}
-            onChange={(e) => setOwnerName(e.target.value)}
-            className="w-full border rounded-xl p-3"
-          />
+        <input
+          type="text"
+          placeholder="Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className="w-full border rounded-xl p-4 mb-4"
+        />
 
-          <input
-            type="text"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full border rounded-xl p-3"
-          />
+        <textarea
+          placeholder="Company Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="w-full border rounded-xl p-4 mb-4 h-32"
+        />
 
-          <textarea
-            placeholder="Company Address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            rows={3}
-            className="w-full border rounded-xl p-3"
-          />
+        <input
+          type="text"
+          placeholder="GST Number"
+          value={gstNumber}
+          onChange={(e) => setGstNumber(e.target.value)}
+          className="w-full border rounded-xl p-4 mb-6"
+        />
 
-          <input
-            type="text"
-            placeholder="GST Number"
-            value={gstNumber}
-            onChange={(e) => setGstNumber(e.target.value)}
-            className="w-full border rounded-xl p-3"
-          />
-
-          <button
-            onClick={saveCompany}
-            disabled={loading}
-            className="w-full bg-[#1F5E3B] hover:bg-green-800 text-white py-3 rounded-2xl font-semibold"
-          >
-            {loading ? "Saving..." : "Save & Continue"}
-          </button>
-
-        </div>
+        <button
+          onClick={saveCompany}
+          disabled={loading}
+          className="w-full bg-[#1F5E3B] hover:bg-green-800 text-white py-4 rounded-xl font-semibold text-lg"
+        >
+          {loading ? "Saving..." : "Save & Continue"}
+        </button>
 
       </div>
     </div>

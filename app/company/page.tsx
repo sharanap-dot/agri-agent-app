@@ -31,7 +31,8 @@ export default function CompanyPage() {
 
     if (data) {
       setCompany(data);
-      setCompanyName(data.company_name || "");
+
+      setCompanyName(data.name || "");
       setOwnerName(data.owner_name || "");
       setPhone(data.phone || "");
       setAddress(data.address || "");
@@ -47,10 +48,10 @@ export default function CompanyPage() {
     const { error } = await supabase
       .from("company")
       .update({
-        company_name: companyName,
+        name: companyName,
         owner_name: ownerName,
-        phone,
-        address,
+        phone: phone,
+        address: address,
         gst_number: gstNumber,
       })
       .eq("id", company.id);
@@ -62,7 +63,7 @@ export default function CompanyPage() {
       return;
     }
 
-    alert("Company updated successfully");
+    alert("Company Updated Successfully");
     loadCompany();
   }
 
@@ -70,12 +71,12 @@ export default function CompanyPage() {
     <div className="min-h-screen bg-[#F8F7F4] p-4 md:p-8">
       <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-lg p-8">
 
-        <h1 className="text-3xl md:text-4xl font-bold text-[#1F5E3B] mb-2">
-          🏢 Company Settings
+        <h1 className="text-4xl font-bold text-[#1F5E3B] mb-2">
+          Company Settings
         </h1>
 
         <p className="text-gray-600 mb-8">
-          Update company details
+          Manage Company Information
         </p>
 
         <div className="space-y-4">
@@ -84,9 +85,7 @@ export default function CompanyPage() {
             type="text"
             placeholder="Company Name"
             value={companyName}
-            onChange={(e) =>
-              setCompanyName(e.target.value)
-            }
+            onChange={(e) => setCompanyName(e.target.value)}
             className="w-full border rounded-xl p-3"
           />
 
@@ -94,9 +93,7 @@ export default function CompanyPage() {
             type="text"
             placeholder="Owner Name"
             value={ownerName}
-            onChange={(e) =>
-              setOwnerName(e.target.value)
-            }
+            onChange={(e) => setOwnerName(e.target.value)}
             className="w-full border rounded-xl p-3"
           />
 
@@ -104,19 +101,15 @@ export default function CompanyPage() {
             type="text"
             placeholder="Phone Number"
             value={phone}
-            onChange={(e) =>
-              setPhone(e.target.value)
-            }
+            onChange={(e) => setPhone(e.target.value)}
             className="w-full border rounded-xl p-3"
           />
 
           <textarea
-            placeholder="Address"
+            placeholder="Company Address"
             value={address}
-            onChange={(e) =>
-              setAddress(e.target.value)
-            }
-            rows={3}
+            onChange={(e) => setAddress(e.target.value)}
+            rows={4}
             className="w-full border rounded-xl p-3"
           />
 
@@ -124,22 +117,19 @@ export default function CompanyPage() {
             type="text"
             placeholder="GST Number"
             value={gstNumber}
-            onChange={(e) =>
-              setGstNumber(e.target.value)
-            }
+            onChange={(e) => setGstNumber(e.target.value)}
             className="w-full border rounded-xl p-3"
           />
 
           <button
             onClick={updateCompany}
             disabled={loading}
-            className="w-full bg-[#1F5E3B] hover:bg-green-800 text-white py-3 rounded-2xl font-semibold"
+            className="w-full bg-[#1F5E3B] text-white py-3 rounded-xl font-semibold"
           >
             {loading ? "Updating..." : "Update Company"}
           </button>
 
         </div>
-
       </div>
     </div>
   );
