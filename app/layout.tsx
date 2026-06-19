@@ -1,37 +1,21 @@
-import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "AgriLedger ERP",
-  description: "Agricultural Trading ERP",
-  manifest: "/manifest.json",
-
-  icons: {
-    icon: "/icon-192.png",
-    apple: "/icon-192.png",
-  },
-
-  appleWebApp: {
-    capable: true,
-    title: "AgriLedger ERP",
-    statusBarStyle: "default",
-  },
-};
-
-export const viewport: Viewport = {
-  themeColor: "#1F5E3B",
-  width: "device-width",
-  initialScale: 1,
+  description: "Agricultural Commission ERP Dashboard",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-[#F8F7F4] text-gray-900">
+        {children}
+      </body>
     </html>
   );
 }
