@@ -1,23 +1,47 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Remove arrows from all number inputs */
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/* Smooth UI */
 
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background: #F8F7F4;
-  font-family: Georgia, serif;
+  background: #f8f7f4;
+  color: #111827;
 }
 
-* {
-  box-sizing: border-box;
-}
+/* Custom scrollbar */
 
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1F5E3B;
+  background: #1f5e3b;
   border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #17462c;
 }
