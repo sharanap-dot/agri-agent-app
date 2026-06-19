@@ -76,11 +76,9 @@ export default function TransactionsPage() {
     const price = Number(rate);
 
     const totalAmount = qty * price;
-    const commissionAmount =
-      totalAmount * 0.02;
+    const commissionAmount = totalAmount * 0.02;
     const net = totalAmount - commissionAmount;
 
-    // Save transaction
     const { error } = await supabase
       .from("transactions")
       .insert([
@@ -101,7 +99,6 @@ export default function TransactionsPage() {
       return;
     }
 
-    // Update inventory
     const { data: stock } = await supabase
       .from("inventory")
       .select("*")
@@ -112,8 +109,7 @@ export default function TransactionsPage() {
       await supabase
         .from("inventory")
         .update({
-          quantity:
-            Number(stock.quantity) + qty,
+          quantity: Number(stock.quantity) + qty,
         })
         .eq("id", stock.id);
     } else {
@@ -139,45 +135,8 @@ export default function TransactionsPage() {
     loadTransactions();
   }
 
-  async function deleteTransaction(
-    id: string
-  ) {
-    if (
-      !confirm(
-        "Delete transaction?"
-      )
-    )
-      return;
-
-    const { data: tx } =
-      await supabase
-        .from("transactions")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-    if (tx) {
-      const { data: stock } =
-        await supabase
-          .from("inventory")
-          .select("*")
-          .eq(
-            "crop_name",
-            tx.crop_name
-          )
-          .single();
-
-      if (stock) {
-        await supabase
-          .from("inventory")
-          .update({
-            quantity:
-              Number(stock.quantity) -
-              Number(tx.quantity),
-          })
-          .eq("id", stock.id);
-      }
-    }
+  async function deleteTransaction(id: string) {
+    if (!confirm("Delete transaction?")) return;
 
     await supabase
       .from("transactions")
@@ -188,10 +147,10 @@ export default function TransactionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] p-8">
+    <div className="min-h-screen bg-[#F8F7F4] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
 
-        <h1 className="text-5xl font-bold text-[#1F5E3B] mb-2">
+        <h1 className="text-3xl md:text-5xl font-bold text-[#1F5E3B] mb-2">
           🌾 Transactions Ledger
         </h1>
 
@@ -199,27 +158,24 @@ export default function TransactionsPage() {
           Manage crop purchases and commissions
         </p>
 
-        {/* Form */}
+        {/* FORM */}
+
         <div className="bg-white rounded-3xl shadow-lg p-6 mb-8">
 
           <h2 className="text-2xl font-bold mb-6">
             Add Transaction
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             <select
               value={selectedFarmer}
               onChange={(e) =>
-                setSelectedFarmer(
-                  e.target.value
-                )
+                setSelectedFarmer(e.target.value)
               }
               className="border rounded-xl p-3"
             >
-              <option value="">
-                Select Farmer
-              </option>
+              <option value="">Select Farmer</option>
 
               {farmers.map((f) => (
                 <option
@@ -234,15 +190,11 @@ export default function TransactionsPage() {
             <select
               value={selectedBuyer}
               onChange={(e) =>
-                setSelectedBuyer(
-                  e.target.value
-                )
+                setSelectedBuyer(e.target.value)
               }
               className="border rounded-xl p-3"
             >
-              <option value="">
-                Select Buyer
-              </option>
+              <option value="">Select Buyer</option>
 
               {buyers.map((b) => (
                 <option
@@ -259,9 +211,7 @@ export default function TransactionsPage() {
               placeholder="Crop Name"
               value={cropName}
               onChange={(e) =>
-                setCropName(
-                  e.target.value
-                )
+                setCropName(e.target.value)
               }
               className="border rounded-xl p-3"
             />
@@ -271,9 +221,7 @@ export default function TransactionsPage() {
               placeholder="Quantity"
               value={quantity}
               onChange={(e) =>
-                setQuantity(
-                  e.target.value
-                )
+                setQuantity(e.target.value)
               }
               className="border rounded-xl p-3"
             />
@@ -283,17 +231,16 @@ export default function TransactionsPage() {
               placeholder="Rate"
               value={rate}
               onChange={(e) =>
-                setRate(
-                  e.target.value
-                )
+                setRate(e.target.value)
               }
               className="border rounded-xl p-3"
             />
 
           </div>
 
-          {/* Calculation Cards */}
-          <div className="grid md:grid-cols-3 gap-4 mt-6">
+          {/* CALCULATION CARDS */}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
 
             <div className="bg-green-100 p-5 rounded-2xl">
               <h3>Total</h3>
@@ -320,16 +267,53 @@ export default function TransactionsPage() {
 
           <button
             onClick={saveTransaction}
-            className="mt-6 bg-[#1F5E3B] text-white px-6 py-3 rounded-2xl"
+            className="mt-6 w-full md:w-auto bg-[#1F5E3B] text-white px-6 py-3 rounded-2xl"
           >
             Save Transaction
           </button>
+
         </div>
 
-        {/* Transactions Table */}
-        <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
+        {/* MOBILE CARDS */}
 
-          <table className="w-full">
+        <div className="md:hidden space-y-4">
+
+          {transactions.map((tx) => (
+            <div
+              key={tx.id}
+              className="bg-white rounded-3xl shadow-lg p-5"
+            >
+              <h2 className="font-bold text-xl text-[#1F5E3B]">
+                {tx.crop_name}
+              </h2>
+
+              <p>👨‍🌾 {tx.farmers?.name}</p>
+              <p>🏢 {tx.buyers?.name}</p>
+              <p>Qty: {tx.quantity}</p>
+              <p>Rate: ₹ {tx.rate}</p>
+
+              <p className="font-bold text-green-700 mt-2">
+                Net: ₹ {tx.net_amount}
+              </p>
+
+              <button
+                onClick={() =>
+                  deleteTransaction(tx.id)
+                }
+                className="mt-3 bg-red-600 text-white px-4 py-2 rounded-lg"
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+
+        </div>
+
+        {/* DESKTOP TABLE */}
+
+        <div className="hidden md:block bg-white rounded-3xl shadow-lg overflow-x-auto">
+
+          <table className="w-full min-w-[900px]">
 
             <thead className="bg-[#1F5E3B] text-white">
               <tr>
@@ -344,11 +328,10 @@ export default function TransactionsPage() {
             </thead>
 
             <tbody>
+
               {transactions.map((tx) => (
-                <tr
-                  key={tx.id}
-                  className="border-b"
-                >
+                <tr key={tx.id} className="border-b">
+
                   <td className="p-4">
                     {tx.farmers?.name}
                   </td>
@@ -376,28 +359,17 @@ export default function TransactionsPage() {
                   <td className="p-4">
                     <button
                       onClick={() =>
-                        deleteTransaction(
-                          tx.id
-                        )
+                        deleteTransaction(tx.id)
                       }
                       className="bg-red-600 text-white px-3 py-2 rounded-lg"
                     >
                       Delete
                     </button>
                   </td>
+
                 </tr>
               ))}
 
-              {transactions.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="text-center p-8 text-gray-500"
-                  >
-                    No transactions found
-                  </td>
-                </tr>
-              )}
             </tbody>
 
           </table>
